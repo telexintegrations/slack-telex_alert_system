@@ -6,11 +6,11 @@ const app: Express = express();
 
 app.use(express.json());
 
+app.use("/integration", integrationRouter);
+
 app.get("/", (req: Request, res: Response) => {
   res.send({ statusCode: 200, message: "success" });
 });
-
-app.get("/integration", integrationRouter);
 
 const PORT = envConfig.PORT || 3000;
 
