@@ -1,0 +1,33 @@
+{
+  "name": "slack_messenger",
+  "version": "1.0.0",
+  "description": "Telex integration",
+  "main": "dist/main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/main.js",
+    "build": "npx tsc",
+    "dev": "nodemon src/main.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Odili1/Slack_Messenger.git"
+  },
+  "author": "Diligwe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Odili1/Slack_Messenger/issues"
+  },
+  "homepage": "https://github.com/Odili1/Slack_Messenger#readme",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
