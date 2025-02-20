@@ -1,9 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import { envConfig } from "./config/envConfig";
 import integrationRouter from "./routes/telex-config.route";
+import cors from "cors";
 
 const app: Express = express();
 
+app.use(cors<Request>());
 app.use(express.json());
 
 app.use("/integration", integrationRouter);
