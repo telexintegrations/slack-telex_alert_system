@@ -24,35 +24,41 @@ const slackChannels = (settings: IntegrationSettingType[]): string[] => {
 export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
   try {
     const isValidPrompt = /\/slack-[a-z]*/gi.test(reqBody.message);
-    console.log(`IsValidPrompt: ${isValidPrompt}`);
 
     if (!isValidPrompt) {
+      console.log(`IsValidPrompt: ${isValidPrompt}`);
       return {
-        status: "failed",
-        message: "Invalid Message Prompt",
+        status: "error",
+        message:
+          'Invalid Prompt. \nMessage Prompt - Should be in this format: "/slack-[slack channel]"',
         event_name: `Slack Messenger Error`,
         username: "Slack Alert",
       };
     }
 
-    const channelPrompt = reqBody.message.split("-")[1];
-    console.log(`channelPrompt: ${channelPrompt}`);
+    const refinedPrompt = reqBody.message.replace(/[<p>\/<\/p>]/gi, "");
+    const channelFromPrompt = refinedPrompt.split("-")[1];
+    console.log(`channelPrompt: ${channelFromPrompt}`);
     const allowedSlackChannels = slackChannels(reqBody.settings);
 
-    if (!allowedSlackChannels.includes(channelPrompt)) {
+    if (!allowedSlackChannels.includes(channelFromPrompt)) {
+      console.log(`ChannelNotAllowed: ${channelFromPrompt}`);
       return {
-        status: "failed",
-        message: "Invalid Slack Channel",
+        status: "error",
+        message:
+          "Invalid Prompt. \nSlack Channel - Check settings for allowed slack channels",
         event_name: `Slack Messenger Error`,
         username: "Slack Alert",
       };
     }
 
-    // const ;
+    console.log(
+      `IsAllowedChannels: ${allowedSlackChannels.includes(channelFromPrompt)}`
+    );
     return {
       status: "success",
       message: "Everybody to Room9!",
-      event_name: `Slack ${channelPrompt}`,
+      event_name: `Slack ${channelFromPrompt}`,
       username: "Slack Alert",
     };
   } catch (error) {

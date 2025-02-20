@@ -26,12 +26,6 @@ export const integrationJson = {
         required: true,
         default: "/slack-announcements",
       },
-      {
-        label: "message",
-        type: "text",
-        required: true,
-        default: "basic",
-      },
     ],
     target_url: envConfig.TARGET_URL,
     tick_url: envConfig.TICK_URL,
