@@ -27,20 +27,20 @@ integrationRouter.post(
       const response = handleIncomingMessageService(body);
 
       if (response.status == "error") {
-        const telexResponse = await TelexApiCLient.post(
-          envConfig.TELEX_CHANNEL_ID,
-          response
-        );
+        // const telexResponse = await TelexApiCLient.post(
+        //   envConfig.TELEX_CHANNEL_ID,
+        //   response
+        // );
 
-        res.status(400).json(telexResponse.data);
+        res.status(400).json(response);
       } else {
         console.log(`Response back to Telex: ${JSON.stringify(response)}`);
-        const telexResponse = await TelexApiCLient.post(
-          envConfig.TELEX_CHANNEL_ID,
-          response
-        );
+        // const telexResponse = await TelexApiCLient.post(
+        //   envConfig.TELEX_CHANNEL_ID,
+        //   response
+        // );
 
-        res.status(200).json(telexResponse.data);
+        res.status(200).json(response);
       }
     } catch (error) {
       console.log(error);
