@@ -21,10 +21,10 @@ export const integrationJson = {
     author: "Diligwe",
     settings: [
       {
-        label: "slack-channel",
+        label: "channel",
         type: "text",
         required: true,
-        default: "#announcements",
+        default: "/slack-announcements",
       },
       {
         label: "message",
