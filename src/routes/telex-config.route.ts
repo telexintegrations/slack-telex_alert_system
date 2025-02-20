@@ -24,30 +24,36 @@ integrationRouter.post(
   async (req: Request, res: Response<any>) => {
     try {
       const { body } = req;
-      console.log(req.body);
+      console.log(`reqBody: ${JSON.stringify(req.body)}`);
 
       const response = handleIncomingMessageService(body);
 
       if (response.status == "error") {
-        // const telexResponse = await TelexApiCLient.post(
-        //   envConfig.TELEX_CHANNEL_ID,
-        //   response
-        // );
+        const telexResponse = await TelexApiCLient.post(
+          envConfig.TELEX_CHANNEL_ID,
+          response
+        );
 
-        res.status(400).json(response);
+        if (telexResponse.data.status == "success") {
+          return;
+        }
       } else {
-        console.log(`Response back to Telex: ${JSON.stringify(response)}`);
-        // const telexResponse = await TelexApiCLient.post(
-        //   envConfig.TELEX_CHANNEL_ID,
-        //   response
-        // );
+        console.log(`Response to Telex: ${JSON.stringify(response)}`);
+        const telexResponse = await TelexApiCLient.post(
+          envConfig.TELEX_CHANNEL_ID,
+          response
+        );
 
-        res.status(200).json(response);
+        console.log(
+          `Response from Telex: ${JSON.stringify(telexResponse.data)}`
+        );
+        if (telexResponse.data.status == "success") {
+          return;
+        }
       }
     } catch (error) {
       console.log(error);
-
-      res.status(500).json({ error: "Internal Server Error" });
+      return;
     }
   }
 );

@@ -25,10 +25,10 @@ export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
   try {
     const isValidPrompt = /\/slack-[a-z]*/gi.test(reqBody.message);
 
+    console.log(`IsValidPrompt: ${isValidPrompt}`);
     if (!isValidPrompt) {
-      console.log(`IsValidPrompt: ${isValidPrompt}`);
       return {
-        status: "success",
+        status: "error",
         message:
           'Invalid Prompt. \nMessage Prompt - Should be in this format: "/slack-[slack channel]"',
         event_name: `Slack Messenger Error`,
@@ -44,7 +44,7 @@ export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
     if (!allowedSlackChannels.includes(channelFromPrompt)) {
       console.log(`ChannelNotAllowed: ${channelFromPrompt}`);
       return {
-        status: "success",
+        status: "error",
         message:
           "Invalid Prompt. \nSlack Channel - Check settings for allowed slack channels",
         event_name: `Slack Messenger Error`,
