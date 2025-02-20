@@ -28,8 +28,10 @@ export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
 
     if (!isValidPrompt) {
       return {
-        status: 400,
+        status: "failed",
         message: "Invalid Message Prompt",
+        event_name: `Slack Messenger Error`,
+        username: "Slack Alert",
       };
     }
 
@@ -39,8 +41,10 @@ export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
 
     if (!allowedSlackChannels.includes(channelPrompt)) {
       return {
-        status: 400,
-        message: "Invalid Channel",
+        status: "failed",
+        message: "Invalid Slack Channel",
+        event_name: `Slack Messenger Error`,
+        username: "Slack Alert",
       };
     }
 
@@ -53,8 +57,10 @@ export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
     };
   } catch (error) {
     return {
-      statusCode: 500,
+      status: "failed",
       message: "Internal Server Error",
+      event_name: `Slack Messenger Error`,
+      username: "Slack Alert",
     };
   }
 };
