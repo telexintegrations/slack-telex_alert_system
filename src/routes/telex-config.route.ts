@@ -25,6 +25,7 @@ integrationRouter.post("/slack-messages", (req: Request, res: Response) => {
       res.status(400).json(response);
     }
 
+    console.log(`Response back to Telex: ${JSON.stringify(response)}`);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
