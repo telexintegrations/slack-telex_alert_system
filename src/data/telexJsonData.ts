@@ -16,7 +16,7 @@ export const integrationJson = {
     },
     is_active: true,
     integration_type: "modifier",
-    category_name: "Email & Messaging",
+    integration_category: "Email & Messaging",
     key_features: ["log important information"],
     author: "Diligwe",
     settings: [
