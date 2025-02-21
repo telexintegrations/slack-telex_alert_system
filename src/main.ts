@@ -8,6 +8,13 @@ const app: Express = express();
 app.use(cors<Request>());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  req.setTimeout(5000, () => {
+    res.status(408).send("Request Timeout");
+  });
+  next();
+});
+
 app.use("/integration", integrationRouter);
 
 app.get("/", (req: Request, res: Response) => {

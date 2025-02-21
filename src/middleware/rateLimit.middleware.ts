@@ -1,7 +1,7 @@
 import rateLimit from "express-rate-limit";
 
 const rateLimiter = rateLimit({
-  windowMs: 6 * 1000,
+  windowMs: 60 * 1000,
   max: 1,
   message: "Time Out",
   headers: true,
