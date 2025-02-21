@@ -25,7 +25,9 @@ integrationRouter.post(
     try {
       const { body } = req;
       console.log(`reqBody: ${JSON.stringify(req.body)}`);
-      if (!/^\/slack/gi.test(body.message)) return;
+      // if (!/^\/slack/gi.test(body.message)) {
+      //   res.json({});
+      // }
 
       const response = await handleIncomingMessageService(body);
 
