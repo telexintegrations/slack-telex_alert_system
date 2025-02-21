@@ -85,8 +85,7 @@ export const handleIncomingMessageService = async (
     const formattedTimeStamp = formatDate(new Date(timeStamp));
 
     console.log(`SlackData: ${JSON.stringify(formattedTimeStamp)}`);
-    // return `${formattedTimeStamp}\n${messages.text}`;
-    // return textToTelex.join();
+
     return {
       status: "success",
       message: textToTelex.join(),

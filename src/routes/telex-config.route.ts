@@ -25,7 +25,7 @@ integrationRouter.post(
     try {
       const { body } = req;
       console.log(`reqBody: ${JSON.stringify(req.body)}`);
-      if (!/^\/slack/gi.test(body.message)) {
+      if (!/(\/slack-)/gi.test(body.message)) {
         res.end();
         return;
       }
@@ -33,10 +33,7 @@ integrationRouter.post(
       const response = await handleIncomingMessageService(body);
 
       if (response.status == "error") {
-        const telexResponse = await TelexApiCLient.post(
-          envConfig.TELEX_CHANNEL_ID,
-          response
-        );
+        await TelexApiCLient.post(envConfig.TELEX_CHANNEL_ID, response);
 
         res.end();
         return;
