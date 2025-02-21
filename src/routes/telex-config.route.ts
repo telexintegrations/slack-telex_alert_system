@@ -35,9 +35,9 @@ integrationRouter.post(
           response
         );
 
-        if (telexResponse.data.status == "success") {
-          return;
-        }
+        // if (telexResponse.data.status == "success") {
+        //   return;
+        // }
       } else {
         console.log(`Response to Telex: ${JSON.stringify(response)}`);
         const telexResponse = await TelexApiCLient.post(
@@ -49,9 +49,9 @@ integrationRouter.post(
           `Response from Telex: ${JSON.stringify(telexResponse.data)}`
         );
 
-        if (telexResponse.data.status == "success") {
-          res.status(200).json(response);
-        }
+        // if (telexResponse.data.status == "success") {
+        //   res.status(200).json(response);
+        // }
       }
     } catch (error) {
       console.log(error);
