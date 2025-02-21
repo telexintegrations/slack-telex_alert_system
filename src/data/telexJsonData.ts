@@ -10,8 +10,7 @@ export const integrationJson = {
       app_name: "Slack Alert",
       app_description:
         "An Alert system that sends important messages to Telex channels",
-      app_logo:
-        "https://cdn.pixabay.com/photo/2015/06/12/18/31/cute-807306_1280.png",
+      app_logo: "https://img.icons8.com/nolan/64/slack-new.png",
       app_url: "https://slack-messenger.onrender.com/",
       background_color: "#fff",
     },
