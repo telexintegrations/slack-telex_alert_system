@@ -28,6 +28,5 @@ export const integrationJson = {
       },
     ],
     target_url: envConfig.TARGET_URL,
-    tick_url: envConfig.TICK_URL,
   },
 };

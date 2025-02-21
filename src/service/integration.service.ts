@@ -2,6 +2,9 @@ import {
   IntegrationSettingType,
   RequestPayloadType,
 } from "../types/integration.types";
+import { envConfig } from "../config/envConfig";
+import { SlackApiCLient } from "../config/api";
+import { formatDate } from "../utils/date.utils";
 
 const slackChannels = (settings: IntegrationSettingType[]): string[] => {
   const allowedSlackChannels = settings.reduce(
@@ -21,7 +24,9 @@ const slackChannels = (settings: IntegrationSettingType[]): string[] => {
   return allowedSlackChannels;
 };
 
-export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
+export const handleIncomingMessageService = async (
+  reqBody: RequestPayloadType
+) => {
   try {
     const isValidPrompt = /\/slack-[a-z]*/gi.test(reqBody.message);
 
@@ -55,13 +60,42 @@ export const handleIncomingMessageService = (reqBody: RequestPayloadType) => {
     console.log(
       `IsAllowedChannels: ${allowedSlackChannels.includes(channelFromPrompt)}`
     );
+
+    const slackResponse = await SlackApiCLient.get("conversations.history", {
+      headers: { Authorization: `Bearer ${envConfig.SLACK_BOT_TOKEN}` },
+      params: { channel: envConfig.SLACK_CHANNEL_ID, limit: 5 },
+    });
+
+    const textToTelex: string[] = slackResponse.data.messages.reduce(
+      (msgArr: any, msgData: any) => {
+        if (msgData.client_msg_id) {
+          const timeStamp = msgData.ts * 1000;
+          const formattedTimeStamp = formatDate(new Date(timeStamp));
+          const slackText = `${formattedTimeStamp}\n${msgData.text}\n\n\n`;
+          msgArr = [...msgArr, slackText];
+        }
+
+        return msgArr;
+      },
+      []
+    );
+
+    const messages = slackResponse.data.messages[0];
+    const timeStamp = slackResponse.data.messages[0].ts * 1000;
+    const formattedTimeStamp = formatDate(new Date(timeStamp));
+
+    console.log(`SlackData: ${JSON.stringify(formattedTimeStamp)}`);
+    // return `${formattedTimeStamp}\n${messages.text}`;
+    // return textToTelex.join();
     return {
       status: "success",
-      message: "Everybody to Room9!",
+      message: textToTelex.join(),
       event_name: `Slack ${channelFromPrompt}`,
       username: "Slack Alert",
     };
   } catch (error) {
+    console.log(`Service Error: ${error}`);
+
     return {
       status: "failed",
       message: "Internal Server Error",

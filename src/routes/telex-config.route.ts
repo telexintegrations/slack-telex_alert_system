@@ -25,8 +25,9 @@ integrationRouter.post(
     try {
       const { body } = req;
       console.log(`reqBody: ${JSON.stringify(req.body)}`);
+      if (!/^\/slack/gi.test(body.message)) return;
 
-      const response = handleIncomingMessageService(body);
+      const response = await handleIncomingMessageService(body);
 
       if (response.status == "error") {
         const telexResponse = await TelexApiCLient.post(
@@ -47,8 +48,9 @@ integrationRouter.post(
         console.log(
           `Response from Telex: ${JSON.stringify(telexResponse.data)}`
         );
+
         if (telexResponse.data.status == "success") {
-          return;
+          res.status(200).json(response);
         }
       }
     } catch (error) {

@@ -10,7 +10,7 @@ export const TelexApiCLient: AxiosInstance = axios.create({
 });
 
 export const SlackApiCLient: AxiosInstance = axios.create({
-  baseURL: envConfig.SLACK_CHANNEL_WEBHOOK,
+  baseURL: envConfig.SLACK_API_WEBHOOK,
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
