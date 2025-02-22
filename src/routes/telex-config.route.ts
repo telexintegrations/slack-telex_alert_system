@@ -26,7 +26,7 @@ integrationRouter.post(
     try {
       const { body } = req;
       logger.info(`REQBODY`, req.body);
-      const expectedPromptPattern = /^(\/+slack-)/gi;
+      const expectedPromptPattern = /(\/+slack-)/gi;
       if (!expectedPromptPattern.test(body.message)) {
         res.end();
         return;
