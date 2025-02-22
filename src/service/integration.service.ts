@@ -6,6 +6,10 @@ import {
 import { SlackApiCLient } from "../config/api";
 import { formatDate, getUnixTimestamp } from "../utils/date.utils";
 import logger from "../config/logger";
+import {
+  isValidSlackCommand,
+  stripHtmlTags,
+} from "../utils/stringFormatter.utils";
 
 const targetedSlackChannels = (
   settings: IntegrationSettingType[]
@@ -103,8 +107,7 @@ export const handleIncomingMessageService = async (
   reqBody: RequestPayloadType
 ) => {
   try {
-    const promptPattern = /\/slack-[a-z]*/gi;
-    const isValidPrompt: boolean = promptPattern.test(reqBody.message);
+    const isValidPrompt: boolean = isValidSlackCommand(reqBody.message);
 
     logger.info(`IsValidPrompt:`, { isValidPrompt });
     if (!isValidPrompt) {
@@ -117,7 +120,7 @@ export const handleIncomingMessageService = async (
       };
     }
 
-    const refinedPrompt: string = reqBody.message.replace(/[<p>\/<\/p>]/gi, "");
+    const refinedPrompt: string = stripHtmlTags(reqBody.message);
     const channelFromPrompt: string = refinedPrompt.split("-")[1];
     logger.info(`channelPrompt:`, { channelFromPrompt });
 
