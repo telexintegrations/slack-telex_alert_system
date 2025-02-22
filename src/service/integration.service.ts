@@ -87,7 +87,7 @@ const getMessagesFromSlack = async (slackConfig: SlackConfigType) => {
       if (msgData.client_msg_id) {
         const timeStamp = msgData.ts * 1000;
         const formattedTimeStamp = formatDate(new Date(timeStamp));
-        const slackText = `${formattedTimeStamp}\n${msgData.text}\n\n\n`;
+        const slackText = `✅ ${formattedTimeStamp}\n${msgData.text}\n\n\n`;
         msgArr = [...msgArr, slackText];
       }
 
@@ -111,7 +111,7 @@ export const handleIncomingMessageService = async (
       return {
         status: "error",
         message:
-          'Invalid Prompt. \nMessage Prompt - Should be in this format: "/slack-[slack channel]"',
+          '❌ Invalid Prompt. \nMessage Prompt - Should be in this format: "/slack-[slack channel]"',
         event_name: `Slack Messenger Error`,
         username: "Slack Alert",
       };
@@ -130,7 +130,7 @@ export const handleIncomingMessageService = async (
       return {
         status: "error",
         message:
-          "Invalid Prompt. \nSlack Channel - Check settings for allowed slack channels",
+          "❌ Invalid Prompt. \nSlack Channel - Check settings for allowed slack channels",
         event_name: `Slack Messenger Error`,
         username: "Slack Alert",
       };
@@ -151,7 +151,7 @@ export const handleIncomingMessageService = async (
 
     return {
       status: "success",
-      message: slackMessages.join(),
+      message: slackMessages.join(","),
       event_name: `Slack ${channelFromPrompt}`,
       username: "Slack Alert",
     };
