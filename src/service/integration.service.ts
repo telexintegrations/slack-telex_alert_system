@@ -103,8 +103,6 @@ export const handleIncomingMessageService = async (
   reqBody: RequestPayloadType
 ) => {
   try {
-    logger.info(`ServiceReqBody:`, { reqBody });
-
     const promptPattern = /\/slack-[a-z]*/gi;
     const isValidPrompt: boolean = promptPattern.test(reqBody.message);
 
