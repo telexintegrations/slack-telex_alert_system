@@ -26,7 +26,7 @@ integrationRouter.post(
     try {
       const { body } = req;
       logger.info(`REQBODY`, req.body);
-      const expectedPromptPattern = /(\/+slack-)/gi;
+      const expectedPromptPattern = /(slack-)/gi;
       if (!expectedPromptPattern.test(body.message)) {
         res.end();
         return;
@@ -37,7 +37,6 @@ integrationRouter.post(
       if (response.status == "error") {
         await TelexApiCLient.post(envConfig.TELEX_CHANNEL_ID, response);
 
-        // res.json(response);
         res.end();
         return;
       } else {
@@ -50,7 +49,6 @@ integrationRouter.post(
         logger.info(`RESPONSE FROM TELEX:`, {
           telexResponseData: telexResponse.data,
         });
-        // res.json(response);
         res.end();
         return;
       }
