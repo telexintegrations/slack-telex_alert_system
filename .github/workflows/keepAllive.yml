@@ -10,4 +10,4 @@ jobs:
 
 steps:
   - name: Ping API to Keep It Alive
-    run: curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_PUBLIC_URL }}"
+  - run: curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_PUBLIC_URL }}"
