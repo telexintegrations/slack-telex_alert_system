@@ -7,7 +7,7 @@ interface RequestTracker {
 }
 
 const requestCounts: Record<string, RequestTracker> = {};
-const MAX_REQUESTS = 3;
+const MAX_REQUESTS = 2;
 const TIMEOUT_MS = 30000;
 
 export const requestLimiter: express.RequestHandler = (req, res, next) => {
