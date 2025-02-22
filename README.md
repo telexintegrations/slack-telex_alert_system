@@ -1,4 +1,4 @@
-# 📨 Slack Announcement Channel Integration
+# 📨 Slack Announcement Channel Integration (Slack Alert)
 
 🚀 **Automate and Forward Slack Announcements to Another Software**
 
