@@ -1,14 +1,17 @@
 import {
   IntegrationSettingType,
   RequestPayloadType,
+  SlackConfigType,
 } from "../types/integration.types";
-import { envConfig } from "../config/envConfig";
 import { SlackApiCLient } from "../config/api";
-import { formatDate } from "../utils/date.utils";
+import { formatDate, getUnixTimestamp } from "../utils/date.utils";
+import logger from "../config/logger";
 
-const slackChannels = (settings: IntegrationSettingType[]): string[] => {
+const targetedSlackChannels = (
+  settings: IntegrationSettingType[]
+): string[] => {
   const allowedSlackChannels = settings.reduce(
-    (channelsArr: string[], setting) => {
+    (channelsArr: string[], setting: IntegrationSettingType) => {
       if (setting.label === "channel") {
         const channelName = setting.default.split("-")[1];
         channelsArr = [...channelsArr, channelName];
@@ -19,18 +22,93 @@ const slackChannels = (settings: IntegrationSettingType[]): string[] => {
     []
   );
 
-  console.log(allowedSlackChannels);
+  logger.info(`ALLOWEDCHANNELS`, { allowedSlackChannels });
 
   return allowedSlackChannels;
+};
+
+const getSlackConfigFromSettings = (
+  settings: IntegrationSettingType[]
+): SlackConfigType => {
+  logger.info(`SLACKSETTINGS 1:`, { settings });
+  const slackConfig = settings.reduce<SlackConfigType>(
+    (slackConfigObj: SlackConfigType, setting: IntegrationSettingType) => {
+      logger.info(`SLACKSETTINGS 2:`, { setting });
+      logger.info(`SLACKSETTINGS TEST:`, {
+        StartsWith: /^slack/gi.test(setting.label),
+      });
+      if (/^slack/gi.test(setting.label)) {
+        logger.info(`SLACKSETTINGS_LABEL:`, { settingLabel: setting.label });
+
+        slackConfigObj = {
+          ...slackConfigObj,
+          [setting.label]: setting.default,
+        };
+      }
+
+      return slackConfigObj;
+    },
+    { slack_bot_token: "", slack_channel_id: "", slack_api_webhook: "" }
+  );
+
+  return slackConfig;
+};
+
+const getMessagesFromSlack = async (slackConfig: SlackConfigType) => {
+  const now = new Date();
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+  logger.info(
+    `SLACKCONFIG:`,
+    { slackConfig },
+    `TIME: ${getUnixTimestamp(oneDayAgo)},${getUnixTimestamp(now)}`
+  );
+
+  const slackResponse = await SlackApiCLient(slackConfig.slack_api_webhook).get(
+    "conversations.history",
+    {
+      headers: { Authorization: `Bearer ${slackConfig.slack_bot_token}` },
+      params: {
+        channel: slackConfig.slack_channel_id,
+        limit: 5,
+        // oldest: getUnixTimestamp(oneDayAgo).toFixed(6),
+        // latest: getUnixTimestamp(now),
+      },
+      paramsSerializer: (params) => {
+        return Object.entries(params)
+          .map(([key, val]) => `${key}=${encodeURIComponent(val as string)}`)
+          .join("&");
+      },
+    }
+  );
+
+  const textToTelex: string[] = slackResponse.data.messages.reduce(
+    (msgArr: any, msgData: any) => {
+      if (msgData.client_msg_id) {
+        const timeStamp = msgData.ts * 1000;
+        const formattedTimeStamp = formatDate(new Date(timeStamp));
+        const slackText = `${formattedTimeStamp}\n${msgData.text}\n\n\n`;
+        msgArr = [...msgArr, slackText];
+      }
+
+      return msgArr;
+    },
+    []
+  );
+
+  return textToTelex;
 };
 
 export const handleIncomingMessageService = async (
   reqBody: RequestPayloadType
 ) => {
   try {
-    const isValidPrompt = /\/slack-[a-z]*/gi.test(reqBody.message);
+    logger.info(`ServiceReqBody:`, { reqBody });
 
-    console.log(`IsValidPrompt: ${isValidPrompt}`);
+    const promptPattern = /\/slack-[a-z]*/gi;
+    const isValidPrompt: boolean = promptPattern.test(reqBody.message);
+
+    logger.info(`IsValidPrompt:`, { isValidPrompt });
     if (!isValidPrompt) {
       return {
         status: "error",
@@ -41,13 +119,16 @@ export const handleIncomingMessageService = async (
       };
     }
 
-    const refinedPrompt = reqBody.message.replace(/[<p>\/<\/p>]/gi, "");
-    const channelFromPrompt = refinedPrompt.split("-")[1];
-    console.log(`channelPrompt: ${channelFromPrompt}`);
-    const allowedSlackChannels = slackChannels(reqBody.settings);
+    const refinedPrompt: string = reqBody.message.replace(/[<p>\/<\/p>]/gi, "");
+    const channelFromPrompt: string = refinedPrompt.split("-")[1];
+    logger.info(`channelPrompt:`, { channelFromPrompt });
+
+    const allowedSlackChannels: string[] = targetedSlackChannels(
+      reqBody.settings
+    );
 
     if (!allowedSlackChannels.includes(channelFromPrompt)) {
-      console.log(`ChannelNotAllowed: ${channelFromPrompt}`);
+      logger.info(`ChannelNotAllowed:`, { channelFromPrompt });
       return {
         status: "error",
         message:
@@ -57,43 +138,27 @@ export const handleIncomingMessageService = async (
       };
     }
 
-    console.log(
-      `IsAllowedChannels: ${allowedSlackChannels.includes(channelFromPrompt)}`
+    logger.info(
+      `IsAllowedChannels:`,
+      allowedSlackChannels.includes(channelFromPrompt)
     );
 
-    const slackResponse = await SlackApiCLient.get("conversations.history", {
-      headers: { Authorization: `Bearer ${envConfig.SLACK_BOT_TOKEN}` },
-      params: { channel: envConfig.SLACK_CHANNEL_ID, limit: 5 },
-    });
-
-    const textToTelex: string[] = slackResponse.data.messages.reduce(
-      (msgArr: any, msgData: any) => {
-        if (msgData.client_msg_id) {
-          const timeStamp = msgData.ts * 1000;
-          const formattedTimeStamp = formatDate(new Date(timeStamp));
-          const slackText = `${formattedTimeStamp}\n${msgData.text}\n\n\n`;
-          msgArr = [...msgArr, slackText];
-        }
-
-        return msgArr;
-      },
-      []
+    const slackConfig: SlackConfigType = getSlackConfigFromSettings(
+      reqBody.settings
     );
 
-    const messages = slackResponse.data.messages[0];
-    const timeStamp = slackResponse.data.messages[0].ts * 1000;
-    const formattedTimeStamp = formatDate(new Date(timeStamp));
+    const slackMessages: string[] = await getMessagesFromSlack(slackConfig);
 
-    console.log(`SlackData: ${JSON.stringify(formattedTimeStamp)}`);
+    logger.info(`SLACKMESSAGES`, slackMessages);
 
     return {
       status: "success",
-      message: textToTelex.join(),
+      message: slackMessages.join(),
       event_name: `Slack ${channelFromPrompt}`,
       username: "Slack Alert",
     };
   } catch (error) {
-    console.log(`Service Error: ${error}`);
+    logger.info(`Service Error:`, { error });
 
     return {
       status: "failed",

@@ -18,3 +18,9 @@ export type ResponsePayloadType = {
   event_name: string;
   username: string;
 };
+
+export type SlackConfigType = {
+  slack_bot_token: string;
+  slack_channel_id: string;
+  slack_api_webhook: string;
+};

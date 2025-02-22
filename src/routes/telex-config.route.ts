@@ -5,6 +5,7 @@ import { ResponsePayloadType } from "../types/integration.types";
 import { TelexApiCLient } from "../config/api";
 import { envConfig } from "../config/envConfig";
 import { requestLimiter } from "../middleware/rateLimit.middleware";
+import logger from "../config/logger";
 
 const integrationRouter = Router();
 
@@ -12,7 +13,7 @@ integrationRouter.get("/telex-config", (_req: Request, res: Response<any>) => {
   try {
     res.status(200).json(integrationJson);
   } catch (error) {
-    console.log(error);
+    logger.error(error);
 
     res.status(400).json({ error: "Failed to read json data" });
   }
@@ -24,8 +25,9 @@ integrationRouter.post(
   async (req: Request, res: Response<any>) => {
     try {
       const { body } = req;
-      console.log(`reqBody: ${JSON.stringify(req.body)}`);
-      if (!/(\/+slack-)/gi.test(body.message)) {
+      logger.info(`REQBODY`, req.body);
+      const expectedPromptPattern = /^(\/+slack-)/gi;
+      if (!expectedPromptPattern.test(body.message)) {
         res.end();
         return;
       }
@@ -35,23 +37,25 @@ integrationRouter.post(
       if (response.status == "error") {
         await TelexApiCLient.post(envConfig.TELEX_CHANNEL_ID, response);
 
+        // res.json(response);
         res.end();
         return;
       } else {
-        console.log(`Response to Telex: ${JSON.stringify(response)}`);
+        logger.info(`RESPONSE TO TELEX:`, { response });
         const telexResponse = await TelexApiCLient.post(
           envConfig.TELEX_CHANNEL_ID,
           response
         );
 
-        console.log(
-          `Response from Telex: ${JSON.stringify(telexResponse.data)}`
-        );
+        logger.info(`RESPONSE FROM TELEX:`, {
+          telexResponseData: telexResponse.data,
+        });
+        // res.json(response);
         res.end();
         return;
       }
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       res.end();
       return;
     }

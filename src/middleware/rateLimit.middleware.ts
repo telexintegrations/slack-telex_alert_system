@@ -1,4 +1,5 @@
 import express from "express";
+import logger from "../config/logger";
 
 interface RequestTracker {
   count: number;
@@ -20,7 +21,7 @@ export const requestLimiter: express.RequestHandler = (req, res, next) => {
   tracker.count += 1;
 
   if (tracker.count > MAX_REQUESTS) {
-    console.log({ error: "Too many requests. Try again later." });
+    logger.error({ error: "Too many requests. Try again later." });
     res.end();
     return;
   }
