@@ -9,7 +9,7 @@ export const integrationJson = {
     descriptions: {
       app_name: "Slack Alert",
       app_description:
-        "An Alert system: \nThis integration listens to messages posted in a designated Slack Announcements channel and forwards them to another system via a webhook or API. This logs only the slack announcement channel messages. Expect other channels included in the next versions of this integration. \n\nYou can go on to the settings to set configurations necessary for this integration to work seamlessly.",
+        "An Alert system - \nThis integration checks for trigger commands such as `/slack_announcements' made on your channel and fetches messages from the designated Slack channel and forwards them to your system via a webhook or API. This works only for the slack announcement channel messages in this version. Expect implementations for other slack channels in the next progressive versions of this integration. \n\nYou can go on to the settings to set configurations necessary for this integration to work seamlessly.",
       app_logo: "https://img.icons8.com/nolan/64/slack-new.png",
       app_url: "https://slack-messenger.onrender.com/",
       background_color: "#fff",
