@@ -4,6 +4,12 @@
 
 This integration listens to messages posted in a designated Slack **#announcements** channel and forwards them to another system via a webhook or API.
 
+## Quick Test
+To test this integration before moving on to the features, in the input field type in this command:
+```bash
+   /slack-announcements
+```
+
 ## 📌 Features
 
 - ✅ Fetch messages from Slack’s **#announcements** channel
