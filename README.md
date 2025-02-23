@@ -13,7 +13,6 @@ To test this integration before moving on to the features, in the input field ty
 ## 📌 Features
 
 - ✅ Fetch messages from Slack’s **#announcements** channel
-- ✅ Filter messages based on time or specific keywords
 - ✅ Forward messages to an external API or database
 - ✅ Handle retries for failed message deliveries
 - ✅ Secure authentication with Slack OAuth tokens
